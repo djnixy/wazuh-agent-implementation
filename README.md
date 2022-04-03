@@ -1,8 +1,8 @@
 # wazuh-agent-implementation
 
-DVWA and Wazuh Server
+### DVWA and Wazuh Server
 
-Installation
+#### Installation
 
 You will need to provision 2 VM (for example, I personally use AWS):
  
@@ -11,19 +11,23 @@ t3.small (2 vCPU, 2GB RAM)
  
 BETA VM for Wazuh Server:
 t3.medium (2 vCPU, 4GB RAM)
- 
-BETA VM Installation
+
+- - -
+
+#### BETA VM Installation
  
 Run this script to install Wazuh server:
- 
+```
 apt update && apt upgrade
 curl -so ~/unattended-installation.sh https://packages.wazuh.com/resources/4.2/open-distro/unattended-installation/unattended-installation.sh && bash ~/unattended-installation.sh
- 
+```
 The installer will inform you which credentials you can use to login to your Wazuh server.
 
-ALPHA VM Installation 
+- - -
+
+#### ALPHA VM Installation 
 Run the scripts below on ALPHA VM as root:
- 
+```
 apt-get update && apt-get -y install apache2 php php-mysqli php-gd libapache2-mod-php ca-certificates curl gnupg lsb-release
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo \
@@ -32,39 +36,43 @@ echo \
  
 apt-get update
 apt-get -y install docker-ce docker-ce-cli containerd.io
- 
-Run mariaDB docker container:
+```
 
+****Run mariaDB docker container:****
+```
 docker run -itd --rm --name dvwadb -e MARIADB_DATABASE=dvwa -e MARIADB_USER=dvwa -e MARIADB_PASSWORD=p@ssw0rd -e MARIADB_ROOT_PASSWORD=p@ssw0rd -v "dvwadb-data:/var/lib/mysql" -p 3306:3306 mariadb:latest
- 
-Deploy app to apache web server:
-
+```
+****Deploy app to apache web server:****
+```
 git clone https://github.com/djnixy/DVWA
 rm -r /var/www/html/index.html
 rsync -avP DVWA/ /var/www/html/
- 
-Install Wazuh Agent
+```
+****Install Wazuh Agent****
  
 Please note that you need to specify BETA VM’s IP address when installing Wazuh agent.
 
 Run the scripts below as root:
-
+```
 curl -so wazuh-agent-4.2.6.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.2.6-1_amd64.deb && sudo WAZUH_MANAGER='<your wazuh server ip>' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-4.2.6.deb
  
 systemctl daemon-reload
 systemctl enable wazuh-agent
 systemctl start wazuh-agent
-
+```
 Now you can access DVWA using default credentials:
+```
 User: admin
 Password: password
-
+```
 ![image](https://user-images.githubusercontent.com/17786996/161450639-8296cd16-9bb8-4bc1-835b-213eeda15ad0.png)
 
 
 Click Create / Reset Database to initialize database.
- 
-DEMO
+
+- - -
+
+### DEMO
 
 Cross Site Scripting attack:
  
